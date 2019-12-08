@@ -1,0 +1,156 @@
+# Copyright (C) 2019 Blu Wireless Ltd.
+# All Rights Reserved.
+#
+# This file is part of BLADE.
+#
+# BLADE is free software: you can redistribute it and/or modify it under the
+# terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
+#
+# BLADE is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# BLADE.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+# Get the path to this Makefile's directory
+THIS_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+
+include $(THIS_DIR)/Makefile.common
+
+# ==============================================================================
+# Input Variables
+# ==============================================================================
+
+# Locate tools
+TEMPLATOR  ?= blade-templating
+BLADE_CORE ?= blade
+
+# Input and Output Variables
+BLOB_OUTPUT_DIR     ?= $(abspath $(BUILD_DIR)/blobs)
+DEPS_DIR            ?= $(abspath $(BUILD_DIR)/deps)
+VERILOG_OUTPUT_DIR  ?= $(abspath $(BUILD_DIR)/verilog)
+TEMPLATE_DIR        ?= $(abspath $(THIS_DIR)/../templating/templates)
+GENERATION_RULES    += $(abspath $(THIS_DIR)/../templating/rules/standard.py)
+GENERATION_THREADS  ?= 5
+GENERATION_EXCLUDES ?=
+
+# YAML Source Directories
+YAML_SRC_DIRS ?=
+YAML_SRC_DIRS += $(abspath $(THIS_DIR)/../constants)
+YAML_SRC_DIRS += $(abspath $(THIS_DIR)/../interconnects)
+
+# Check arguments
+ifeq ($(YAML_SRC_DIRS),)
+  $(info ERROR: YAML_SRC_DIRS has not been set)
+  $(error 1)
+endif
+
+# Top-level YAML files
+YAML_TOP_LEVELS ?=
+
+ifeq ($(YAML_TOP_LEVELS),)
+  $(info ERROR: YAML_TOP_LEVELS have not been defined)
+endif
+
+# ==============================================================================
+# Output Variables
+# ==============================================================================
+
+# Options to BLADE Core
+BLADE_CORE_OPTS += $(foreach f,$(YAML_SRC_DIRS),--include $(abspath $(f)))
+
+# Options to BLADE generation driver
+BLADE_GEN_OPTS += $(foreach r,$(GENERATION_RULES),--ruleset $(r))
+BLADE_GEN_OPTS += --parallel $(GENERATION_THREADS)
+BLADE_GEN_OPTS += --templates $(TEMPLATE_DIR)
+BLADE_GEN_OPTS += $(foreach x,$(GENERATION_EXCLUDES),--exclude $(x))
+
+# Verbosity modifiers
+ifeq ($(QUIET),yes)
+  BLADE_CORE_OPTS += --quiet
+endif
+ifneq ($(DEBUG),no)
+  BLADE_CORE_OPTS += --debug
+  BLADE_GEN_OPTS  += --verbose
+endif
+
+# Collect all of the generation directories
+GEN_DIRS = $(BLOB_OUTPUT_DIR) $(VERILOG_OUTPUT_DIR)
+
+# Collect generation targets
+GEN_TARGETS += $(GEN_DIRS)
+
+# ==============================================================================
+# Include Rules From Other Makefiles
+# ==============================================================================
+export PYTHONPATH := $(PYTHONPATH):$(BLADE_CORE_DIR):$(DESIGN_FORMAT_DIR)/python
+
+# ==============================================================================
+# Rules: Generation
+# ==============================================================================
+
+define DO_GENERATE
+# Generate a templated file from a DesignFormat blob
+# $(1): Path to the input YAML file
+# $(2): Output directory for generated files
+$(DEPS_DIR)/$(patsubst %.yaml,%_gen.d,$(notdir $(1))): $(BLOB_OUTPUT_DIR)/$(patsubst %.yaml,%.df_blob,$(notdir $(1))) | $(2)
+	$(PRECMD)echo "# Generating files from $(patsubst %.yaml,%.df_blob,$(notdir $(1)))"
+	$(PRECMD)$(TEMPLATOR) $(BLADE_GEN_OPTS) -d $$@ $$< $(2)
+GEN_TARGETS += $(DEPS_DIR)/$(patsubst %.yaml,%_gen.d,$(notdir $(1)))
+endef
+
+# ==============================================================================
+# Rules: Blob Generation Rules
+# ==============================================================================
+
+define DO_GENERATE_BLOB
+# Create a rule for blob generation for a particular YAML source directory
+# $(1): The YAML source directory
+$(abspath $(BLOB_OUTPUT_DIR)/%.df_blob): $(1)/%.yaml $(GENERATION_EXCLUDES) | $(GEN_DIRS) $(DEPS_DIR)
+	@echo "# Generating blob $$(notdir $$@) from $$<"
+	$(PRECMD)$(BLADE_CORE) \
+        --top $$< \
+        --output $$@ \
+        --report \
+        --report-path $$@.html \
+        --dependencies \
+        --MF $(DEPS_DIR)/$$(notdir $$@.d) --MT $$@ \
+        $(BLADE_CORE_OPTS)
+endef
+
+$(eval $(foreach d,$(YAML_SRC_DIRS),$(call DO_GENERATE_BLOB,$(d))))
+
+# ==============================================================================
+# Rules: Module Generation Rules
+# ==============================================================================
+
+# For every YAML top, run generation
+$(eval $(foreach y,$(YAML_TOP_LEVELS),$(call DO_GENERATE,$(y),$(VERILOG_OUTPUT_DIR))))
+
+# ==============================================================================
+# Rules: Depedency Rules
+# ==============================================================================
+ifneq ($(findstring generate,$(MAKE_CMD_GOALS)),)
+-include $(DEPS_DIR)/*.d
+endif
+
+# ==============================================================================
+# Rules: Directories
+# ==============================================================================
+$(BUILD_DIR) $(BLOB_OUTPUT_DIR) $(VERILOG_OUTPUT_DIR) $(DEPS_DIR):
+	@echo "# Creating directory $@"
+	$(PRECMD)mkdir -p $@
+
+# ==============================================================================
+# Rules: Top-Level Targets
+# ==============================================================================
+generate:
+	@$(MAKE) -j $(MAKE_J) $(GEN_TARGETS)
+
+clean:
+	@echo "# Removing directories: $(GEN_DIRS)"
+	$(PRECMD)-rm -rf $(GEN_DIRS)

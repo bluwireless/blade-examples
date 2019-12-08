@@ -1,0 +1,66 @@
+# Copyright (C) 2019 Blu Wireless Ltd.
+# All Rights Reserved.
+#
+# This file is part of BLADE.
+#
+# BLADE is free software: you can redistribute it and/or modify it under the
+# terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
+#
+# BLADE is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# BLADE.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+#include "axi4_lite.yaml"
+#include "wire.yaml"
+
+#include "counter_core_wrap.yaml"
+#include "counter_manager.yaml"
+#include "counter_ctrl.yaml"
+
+# ==============================================================================
+# Counter Top-Level
+# ==============================================================================
+- !Mod
+  name       : counter
+  sd         : Top-level of the counter containing multiple instances of the core
+  # ============================================================================
+  # Ports
+  # ============================================================================
+  ports      :
+  # NOTE: Clock (clk) and reset (rst) ports are implicitly created
+  - !HisRef [cfg,   axi4_lite, "Configuration port",                 1, slave ]
+  - !HisRef [irq,   wire,      "Interrupt signal output",            8, master]
+  - !HisRef [clear, wire,      "Raise signal to clear all counters", 1, slave ]
+  # ============================================================================
+  # Submodules
+  # ============================================================================
+  modules    :
+  # Instantiate control block, passing through the number of counter instances
+  - !ModInst
+    name     : control
+    ref      : counter_ctrl
+    sd       : Register interface
+    count    : 1
+  # Instantiate the manager block, again passing the number of instances
+  - !ModInst
+    name     : manager
+    ref      : counter_manager
+    sd       : Management block
+    count    : 1
+  # Create the required number of counter cores
+  - !ModInst [counter, counter_core_wrap, "Counter instances", 8]
+  # ============================================================================
+  # Connections
+  # ============================================================================
+  connections:
+  # Connect manager control signals to counter instances
+  - !Connect
+    points:
+    - !Point [reset_timer, manager]
+    - !Point [clear,       counter]

@@ -1,0 +1,40 @@
+# Copyright (C) 2019 Blu Wireless Ltd.
+# All Rights Reserved.
+#
+# This file is part of BLADE.
+#
+# BLADE is free software: you can redistribute it and/or modify it under the
+# terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
+#
+# BLADE is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# BLADE.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+#include "axi4_lite.yaml"
+#include "buses.yaml"
+#include "wire.yaml"
+#include "timer_ctrl.yaml"
+
+#include "counter_reg.yaml"
+
+# ==============================================================================
+# Counter Control
+# ==============================================================================
+- !Mod
+  name   : counter_ctrl
+  sd     : Control block for the counter
+  options: [IMP, RTL=../imp_src/counter_ctrl.v]
+  # ============================================================================
+  # Ports
+  # ============================================================================
+  ports  :
+  # NOTE: Clock (clk) and reset (rst) ports are implicitly created
+  - !HisRef [cfg,  axi4_lite,  "Configuration port",       1, slave ]
+  - !HisRef [irq,  wire,       "Interrupt signal outputs", 8, master]
+  - !HisRef [ctrl, timer_ctrl, "Timer controls",           8, master]

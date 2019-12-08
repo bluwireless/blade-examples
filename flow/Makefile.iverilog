@@ -1,0 +1,91 @@
+# Copyright (C) 2019 Blu Wireless Ltd.
+# All Rights Reserved.
+#
+# This file is part of BLADE.
+#
+# BLADE is free software: you can redistribute it and/or modify it under the
+# terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
+#
+# BLADE is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# BLADE.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+# Get the path to this Makefile's directory
+THIS_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+
+include $(THIS_DIR)/Makefile.common
+
+# ==============================================================================
+# Variables
+# ==============================================================================
+
+# Gather paths to RTL source directories
+RTL_SRC_DIRS += $(BUILD_DIR)/verilog
+
+# Find all RTL files
+ALL_RTL_SRCS ?= $(foreach d,$(RTL_SRC_DIRS),$(wildcard $(d)/*.vh) $(wildcard $(d)/*.v))
+
+# Filter RTL sources (allow files to be excluded)
+EXCL_RTL_SRCS ?=
+RTL_SRCS      := $(foreach f,$(ALL_RTL_SRCS),$(if $(findstring $(abspath $(f)),$(abspath $(EXCL_RTL_SRCS))),,$(f)))
+
+# Specify a path for simulation artefacts
+SIM_DIR ?= $(BUILD_DIR)/sim
+
+# Specify the name of the simulation log
+SIM_LOG ?= sim.log
+
+# Specify a filelist path
+RTL_FILELIST ?= $(SIM_DIR)/filelist.f
+
+# Specify the design top-level
+RTL_TOP ?=
+
+# Specify any compilation options
+IVERILOG_OPTS += $(foreach d,$(RTL_SRC_DIRS),-I $(abspath $(d))/)
+IVERILOG_OPTS += -c $(abspath $(RTL_FILELIST)) -o $(SIM_DIR)/$(RTL_TOP)
+IVERILOG_OPTS += -s $(RTL_TOP)
+
+ifneq ($(DEBUG),no)
+    IVERILOG_OPTS += -dscope -deval_tree -delaborate -dsynth2
+endif
+
+# Specify any simulation options
+VVP_OPTS += -l $(SIM_LOG) -M $(shell cd $$(dirname $$(which vvp))/../lib/ivl && pwd)
+
+# Specify a trace file for GTKWave
+TRACE_FILE ?=
+
+# ==============================================================================
+# Rules: Filelist Generation
+# ==============================================================================
+$(RTL_FILELIST): $(RTL_SRCS) | $(SIM_DIR)
+	@echo "# Creating filelist $@"
+	$(PRECMD)-rm -f $@
+	$(PRECMD)for f in $(RTL_SRCS); do echo "$$f" >> $@; done
+
+# ==============================================================================
+# Rules: Directories
+# ==============================================================================
+$(SIM_DIR):
+	$(PRECMD)mkdir -p $@
+
+# ==============================================================================
+# Rules: Simulation
+# ==============================================================================
+run: $(RTL_FILELIST)
+	@echo "# Compiling design"
+	$(PRECMD)-rm -f $(SIM_DIR)/$(RTL_TOP)
+	$(PRECMD)iverilog $(IVERILOG_OPTS)
+	@echo "# Running simulation"
+	$(PRECMD)cd $(SIM_DIR) && vvp $(VVP_OPTS) ./$(RTL_TOP)
+
+view:
+	@echo "# Opening waveforms in GTKWave"
+	$(PRECMD)gtkwave $(SIM_DIR)/waves.vcd $(abspath $(TRACE_FILE))

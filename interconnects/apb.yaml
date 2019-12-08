@@ -1,0 +1,61 @@
+# Copyright (C) 2019 Blu Wireless Ltd.
+# All Rights Reserved.
+#
+# This file is part of BLADE.
+#
+# BLADE is free software: you can redistribute it and/or modify it under the
+# terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
+#
+# BLADE is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# BLADE.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+#include "apb_defines.yaml"
+
+# ==============================================================================
+# APB (Advanced Peripheral Bus)
+# ==============================================================================
+- !His
+  name : apb
+  sd   : AMBA Advanced Peripheral Bus
+  ports:
+  - !Port [paddr,   apb_paddr_width, 'Transaction address',  1, 0, master, 'Address bus from master']
+  - !Port [pprot,   apb_pprot_width, 'Protection type',      1, 0, master, 'Designates a normal, privileged, or secure transaction']
+  - !Port [psel,    apb_psel_width,  'Slave selection',      1, 0, master, 'Selects a particular slave to respond to a transaction']
+  - !Port [penable, 1,               'Transaction enable',   1, 0, master, 'Indicates second and subsequent cycles of a transaction']
+  - !Port
+    name : pwrite
+    sd   : Transfer direction
+    ld   : Indicates whether data is being written to or read from the slave
+    role : master
+    width: 1
+    enum :
+    - !Enum [read,  0, 'Read transaction']
+    - !Enum [write, 1, 'Write transaction']
+  - !Port [pwdata,  apb_pdata_width, 'Write data',    1, 0, master, 'The data to be written when PWRITE is high']
+  - !Port [pstrb,   apb_pstrb_width, 'Write strobes', 1, 0, master, 'Specifies which byte lanes should be updated on a write']
+  - !Port
+    name : pready
+    sd   : Ready signal
+    ld   : Flag from slave to extend transaction
+    role : slave
+    width: 1
+    enum :
+    - !Enum [busy,  0, 'Slave not ready - transaction should be extended']
+    - !Enum [ready, 1, 'Slave ready - transaction can complete']
+  - !Port [prdata,  apb_pdata_width, 'Read data', 1, 0, slave,  'Data returned from a read transaction to slave']
+  - !Port
+    name : pslverr
+    sd   : Error signal from slave
+    ld   : Signal used to indicate that a transaction has failed
+    role : slave
+    width: 1
+    enum :
+    - !Enum [ok,    0, 'No error - transaction successful']
+    - !Enum [error, 1, 'Error - transaction failed']

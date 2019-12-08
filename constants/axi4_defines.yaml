@@ -1,0 +1,62 @@
+# Copyright (C) 2019 Blu Wireless Ltd.
+# All Rights Reserved.
+#
+# This file is part of BLADE.
+#
+# BLADE is free software: you can redistribute it and/or modify it under the
+# terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
+#
+# BLADE is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# BLADE.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+# ==============================================================================
+# AXI4 Definitions
+# ==============================================================================
+- !Def [axi4_addr_width, 32, 'Width of AXI4 address']
+
+# ==============================================================================
+# AXI4 Write Definitions
+# ==============================================================================
+- !Def [axi4_awid_width,     8,               'Width of AXI4 awid']
+- !Def [axi4_awlen_width,    8,               'Width of AXI4 awlen']
+- !Def [axi4_awsize_width,   3,               'Width of AXI4 awsize']
+- !Def [axi4_awburst_width,  2,               'Width of AXI4 awburst']
+- !Def [axi4_awlock_width,   1,               'Width of AXI4 awlock']
+- !Def [axi4_awcache_width,  4,               'Width of AXI4 awcache']
+- !Def [axi4_awprot_width,   3,               'Width of AXI4 awprot']
+- !Def [axi4_bid_width,      axi4_awid_width, 'Width of AXI4 bid']
+- !Def [axi4_bresp_width,    2,               'Width of AXI4 bresp']
+- !Def [axi4_awaddr_width,   axi4_addr_width, 'Width of AXI4 awaddr']
+- !Def [axi4_wdata_width,    32,              'Width of AXI4 wdata']
+- !Def [axi4_wstrb_width,    4,               'Width of AXI4 wstrb']
+- !Def [axi4_awqos_width,    4,               'Width of AXI4 awqos']
+- !Def [axi4_awregion_width, 1,               'Width of AXI4 awregion']
+- !Def [axi4_awuser_width,   9,               'Width of AXI4 awuser']
+- !Def [axi4_wuser_width,    1,               'Width of AXI4 wuser']
+- !Def [axi4_buser_width,    1,               'Width of AXI4 buser']
+
+# ==============================================================================
+# AXI4 Read Definitions
+# ==============================================================================
+- !Def [axi4_arid_width,     axi4_awid_width, 'Width of AXI4 arid']
+- !Def [axi4_arlen_width,    8,               'Width of AXI4 arlen']
+- !Def [axi4_arsize_width,   3,               'Width of AXI4 arsize']
+- !Def [axi4_arburst_width,  2,               'Width of AXI4 arburst']
+- !Def [axi4_arlock_width,   1,               'Width of AXI4 arlock']
+- !Def [axi4_arcache_width,  4,               'Width of AXI4 arcache']
+- !Def [axi4_arprot_width,   3,               'Width of AXI4 arprot']
+- !Def [axi4_rid_width,      axi4_awid_width, 'Width of AXI4 rid']
+- !Def [axi4_rresp_width,    2,               'Width of AXI4 rresp']
+- !Def [axi4_araddr_width,   axi4_addr_width, 'Width of AXI4 araddr']
+- !Def [axi4_rdata_width,    32,              'Width of AXI4 rdata']
+- !Def [axi4_arqos_width,    4,               'Width of AXI4 arqos']
+- !Def [axi4_arregion_width, 1,               'Width of AXI4 arregion']
+- !Def [axi4_aruser_width,   9,               'Width of AXI4 aruser']
+- !Def [axi4_ruser_width,    1,               'Width of AXI4 ruser']

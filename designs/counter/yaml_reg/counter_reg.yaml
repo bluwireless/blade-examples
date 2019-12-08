@@ -1,0 +1,119 @@
+# Copyright (C) 2019 Blu Wireless Ltd.
+# All Rights Reserved.
+#
+# This file is part of BLADE.
+#
+# BLADE is free software: you can redistribute it and/or modify it under the
+# terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
+#
+# BLADE is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# BLADE.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+# ==============================================================================
+# Counter Register Set: A group of general controls plus counter-specific groups
+# ==============================================================================
+- !Config
+  order:
+  - !Register [counter_general]
+  - !Macro    [ctrl, counter_control, 8, 1]
+
+# ==============================================================================
+# Counter General Controls
+# ==============================================================================
+- !Group
+  name      : counter_general
+  sd        : General controls for the counter
+  regs      :
+  - !Reg
+    name     : id
+    sd       : Identifier for this block
+    busaccess: RO
+    fields   :
+    - !Field [value, 32, 0, U, 0x12345678, 'ID value']
+
+  - !Reg
+    name     : version
+    sd       : Major and minor version identifier
+    busaccess: RO
+    fields   :
+    - !Field [minor, 16, 0,  U, 0, 'Minor version ID']
+    - !Field [major, 16, 16, U, 1, 'Major version ID']
+
+  - !Reg
+    name       : scratch
+    sd         : Scratch register for storing arbitrary values, not used by counter
+    busaccess  : RW
+    blockaccess: R
+    fields     :
+    - !Field [value, 32, 0, U, 0, 'Scratch value']
+
+# ==============================================================================
+# Counter Instance Specific Controls
+# ==============================================================================
+- !Group
+  name: counter_control
+  type: MACRO
+  sd  : Controls specific to each counter instance
+  regs:
+  - !Reg
+    name       : control
+    sd         : Controls to start, stop, and reset the counter
+    busaccess  : AW
+    blockaccess: R
+    fields     :
+    - !Field
+      name : start
+      sd   : Writing a 1 to this field will start the counter running
+      width: 1
+    - !Field
+      name : stop
+      sd   : Writing a 1 to this field will stop the counter
+      width: 1
+    - !Field
+      name : clear
+      sd   : Writing a 1 to this field will reset the counter to 0
+      width: 1
+
+  - !Reg
+    name       : status
+    sd         : Current status of the counter
+    busaccess  : R
+    blockaccess: RW
+    fields     :
+    - !Field
+      name : state
+      sd   : Current state of the counter
+      width: 1
+      enum :
+      - !Enum [stopped]
+      - !Enum [running]
+
+  - !Reg
+    name       : load
+    sd         : Writing to this register will load a value into the counter
+    busaccess  : AW
+    blockaccess: R
+    fields     :
+    - !Field
+      name : value
+      sd   : Value to load into the counter
+      width: 32
+
+  - !Reg
+    name     : current
+    sd       : Current value of the counter
+    busaccess: AR
+    fields   :
+    - !Field
+      name : value
+      sd   : Value of the counter
+      width: 32
+
+

@@ -1,0 +1,53 @@
+# Copyright (C) 2019 Blu Wireless Ltd.
+# All Rights Reserved.
+#
+# This file is part of BLADE.
+#
+# BLADE is free software: you can redistribute it and/or modify it under the
+# terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
+#
+# BLADE is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# BLADE.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+# ==============================================================================
+# Simple 8-bit bus
+# ==============================================================================
+- !His
+  name : bus_8
+  sd   : Generic 8-bit bus signal type
+  ports:
+  - !Port [data, 8, 'Signal', 1, 0, master]
+
+# ==============================================================================
+# Simple 16-bit bus
+# ==============================================================================
+- !His
+  name : bus_16
+  sd   : Generic 16-bit bus signal type
+  ports:
+  - !Port [data, 16, 'Signal', 1, 0, master]
+
+# ==============================================================================
+# Simple 24-bit bus
+# ==============================================================================
+- !His
+  name : bus_24
+  sd   : Generic 24-bit bus signal type
+  ports:
+  - !Port [data, 24, 'Signal', 1, 0, master]
+
+# ==============================================================================
+# Simple 32-bit bus
+# ==============================================================================
+- !His
+  name : bus_32
+  sd   : Generic 32-bit bus signal type
+  ports:
+  - !Port [data, 32, 'Signal', 1, 0, master]

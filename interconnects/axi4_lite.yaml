@@ -1,0 +1,48 @@
+# Copyright (C) 2019 Blu Wireless Ltd.
+# All Rights Reserved.
+#
+# This file is part of BLADE.
+#
+# BLADE is free software: you can redistribute it and/or modify it under the
+# terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
+#
+# BLADE is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# BLADE.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+#include "axi4_defines.yaml"
+
+# ==============================================================================
+# AXI4-Lite Bus
+# ==============================================================================
+- !His
+  name : axi4_lite
+  sd   : AXI4-Lite interface
+  ports:
+  - !Port [awvalid, 1,                 'Write address valid',  1, 0, master, "Valid write address and control information"]
+  - !Port [awprot,  3,                 'Protection type',      1, 0, master, "Privilege and security level of the transaction and whether the transaction is a data access or an instruction access."]
+  - !Port [awready, 1,                 'Write address ready',  1, 0, slave,  "The slave is ready to accept an address and associated control signals"]
+  - !Port [awaddr,  axi4_awaddr_width, 'Write address',        1, 0, master, "Address of the first transfer in a write burst transaction"]
+  - !Port [wvalid,  1,                 'Write valid',          1, 0, master, "Valid write data and strobes are available"]
+  - !Port [wdata,   axi4_wdata_width,  'Write data',           1, 0, master]
+  - !Port [wstrb,   axi4_wstrb_width,  'Write strobes',        1, 0, master, "Which byte lanes hold valid data and there is one write strobe bit for each eight bits of the write data bus"]
+  - !Port [wready,  1,                 'Write ready',          1, 0, slave,  "The slave can accept the write data"]
+  - !Port [bresp,   2,                 'Write response',       1, 0, slave,  "Status of the write transaction"]
+  - !Port [bvalid,  1,                 'Write response valid', 1, 0, slave,  "Valid write response"]
+  - !Port [bready,  1,                 'Response ready',       1, 0, master, "The master can accept a write response"]
+  - !Port [arvalid, 1,                 'Read address valid',   1, 0, master, "Valid read address and control information"]
+  - !Port [arready, 1,                 'Read address ready',   1, 0, slave,  "The slave is ready to accept an address and associated control signals"]
+  - !Port [araddr,  axi4_awaddr_width, 'Read address',         1, 0, master, "Address of the first transfer in a read burst transaction"]
+  - !Port [arprot,  3,                 'Protection type',      1, 0, master, "Privilege and security level of the transaction and whether the transaction is a data access or an instruction access"]
+  - !Port [rvalid,  1,                 'Read valid',           1, 0, slave,  "The slave is signaling the required read data"]
+  - !Port [rready,  1,                 'Read ready',           1, 0, master, "The master can accept the read data and response information"]
+  - !Port [rresp,   2,                 'Read response',        1, 0, slave,  "Status of the read transfer"]
+  - !Port [rdata,   axi4_rdata_width,  'Read data',            1, 0, slave]
+
+

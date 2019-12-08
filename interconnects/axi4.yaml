@@ -1,0 +1,107 @@
+# Copyright (C) 2019 Blu Wireless Ltd.
+# All Rights Reserved.
+#
+# This file is part of BLADE.
+#
+# BLADE is free software: you can redistribute it and/or modify it under the
+# terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
+#
+# BLADE is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# BLADE.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+#include "axi4_defines.yaml"
+
+# ==============================================================================
+# AXI4 Write Channel (Addr, Write Data)
+# ==============================================================================
+- !His
+  name : axi4_write_channel
+  sd   : AXI4 interface write channel
+  ports:
+  - !Port [awid,     axi4_awid_width,     'Write address ID.',        1, 0, master]
+  - !Port [awaddr,   axi4_awaddr_width,   'Write address.',           1, 0, master, 'The write address gives the address of the first transfer in a write burst transaction.']
+  - !Port [awlen,    axi4_awlen_width,    'Burst length.',            1, 0, master, 'The burst length gives the exact number of transfers in a burst. This information determines the number of data transfers associated with the address.']
+  - !Port [awsize,   axi4_awsize_width,   'Burst size.',              1, 0, master, 'This signal indicates the size of each transfer in the burst.']
+  - !Port [awburst,  axi4_awburst_width,  'Burst type.',              1, 0, master, 'The burst type and the size information, determine how the address for each transfer within the burst is calculated.']
+  - !Port [awlock,   axi4_awlock_width,   'Lock type.',               1, 0, master, 'Provides additional information about the atomic characteristics of the transfer.']
+  - !Port [awcache,  axi4_awcache_width,  'Memory type.',             1, 0, master, 'This signal indicates how transactions are required to progress through a system.']
+  - !Port [awprot,   axi4_awprot_width,   'Protection type.',         1, 0, master, 'This signal indicates the privilege and security level of the transaction, and whether the transaction is a data access or an instruction access.']
+  - !Port [awqos,    axi4_awqos_width,    'Quality of Service, QoS.', 1, 0, master]
+  - !Port [awregion, axi4_awregion_width, 'Region identifier.',       1, 0, master, 'Permits a single physical interface on a slave to be used for multiple logical interfaces.']
+  - !Port [awuser,   axi4_awuser_width,   'User-defined signal.',     1, 0, master, 'Carries design-specific sideband information.']
+  - !Port [awvalid,  1,                   'Write address valid.',     1, 0, master, 'This signal indicates that the channel is signaling valid write address and control information.']
+  - !Port [awready,  1,                   'Write address ready.',     1, 0, slave,  'This signal indicates that the slave is ready to accept an address and associated control signals.']
+  - !Port [wdata,    axi4_wdata_width,    'Write data.',              1, 0, master]
+  - !Port [wstrb,    axi4_wstrb_width,    'Write strobes.',           1, 0, master, 'This signal indicates which byte lanes hold valid data.']
+  - !Port [wlast,    1,                   'Write last.',              1, 0, master, 'This signal indicates the last transfer in a write burst.']
+  - !Port [wuser,    axi4_wuser_width,    'User-defined signal.',     1, 0, master]
+  - !Port [wvalid,   1,                   'Write valid.',             1, 0, master, 'This signal indicates that valid write data and strobes are available.']
+  - !Port [wready,   1,                   'Write ready.',             1, 0, slave,  'This signal indicates that the slave can accept the write data.']
+
+# ==============================================================================
+# AXI4 Write Response Channel
+# ==============================================================================
+- !His
+  name : axi4_write_response
+  sd   : AXI4 interface write channel response
+  ports:
+  - !Port [bid,    axi4_bid_width,   'Response ID tag.',      1, 0, master, 'This signal is the ID tag of the write response.']
+  - !Port [bresp,  axi4_bresp_width, 'Write response.',       1, 0, master, 'This signal indicates the status of the write transaction.']
+  - !Port [buser,  axi4_buser_width, 'User-defined signal.',  1, 0, master]
+  - !Port [bvalid, 1,                'Write response valid.', 1, 0, master, 'This signal indicates that the channel is signaling a valid write response.']
+  - !Port [bready, 1,                'Response ready.',       1, 0, slave,  'This signal indicates that the master can accept a write response.']
+
+# ==============================================================================
+# AXI4 Read Channel (Addr)
+# ==============================================================================
+- !His
+  name : axi4_read_channel
+  sd   : AXI4 interface read channel
+  ports:
+  - !Port [arid,     axi4_arid_width,     'Read address ID.',         1, 0, master, 'This signal is the identification tag for the read address group of signals.']
+  - !Port [araddr,   axi4_araddr_width,   'Read address.',            1, 0, master, 'The read address gives the address of the first transfer in a read burst transaction.']
+  - !Port [arlen,    axi4_arlen_width,    'Burst length.',            1, 0, master, 'This signal indicates the exact number of transfers in a burst.']
+  - !Port [arsize,   axi4_arsize_width,   'Burst size.',              1, 0, master, 'This signal indicates the size of each transfer in the burst.']
+  - !Port [arburst,  axi4_arburst_width,  'Burst type.',              1, 0, master, 'The burst type and the size information determine how the address for each transfer within the burst is calculated.']
+  - !Port [arlock,   axi4_arlock_width,   'Lock type.',               1, 0, master, 'This signal provides additional information about the atomic characteristics of the transfer.']
+  - !Port [arcache,  axi4_arcache_width,  'Memory type.',             1, 0, master, 'This signal indicates how transactions are required to progress through a system.']
+  - !Port [arprot,   axi4_arprot_width,   'Protection type.',         1, 0, master, 'This signal indicates the privilege and security level of the transaction']
+  - !Port [arqos,    axi4_arqos_width,    'Quality of Service, QoS.', 1, 0, master, 'QoS identifier sent for each read transaction.']
+  - !Port [arregion, axi4_arregion_width, 'Region identifier.',       1, 0, master, 'Permits a single physical interface on a slave to be used for multiple logical interfaces.']
+  - !Port [aruser,   axi4_aruser_width,   'User signal.',             1, 0, master, 'Carries design-specific sideband information.']
+  - !Port [arvalid,  1,                   'Read address valid.',      1, 0, master, 'This signal indicates that the channel is signaling valid read address and control information.']
+  - !Port [arready,  1,                   'Read address ready.',      1, 0, slave,  'This signal indicates that the slave is ready to accept an address and associated control signals.']
+
+# ==============================================================================
+# AXI4 Read Response Channel (Read Data)
+# ==============================================================================
+- !His
+  name : axi4_read_response
+  sd   : AXI4 interface read channel response
+  ports:
+  - !Port [rid,    axi4_rid_width,   'Read ID tag.',   1, 0, master, 'This signal is the identification tag for the read data group of signals generated by the slave.']
+  - !Port [rdata,  axi4_rdata_width, 'Read data.',     1, 0, master]
+  - !Port [rresp,  axi4_rresp_width, 'Read response.', 1, 0, master, 'This signal indicates the status of the read transfer.']
+  - !Port [rlast,  1,                'Read last.',     1, 0, master, 'This signal indicates the last transfer in a read burst.']
+  - !Port [ruser,  axi4_ruser_width, 'User signal.',   1, 0, master, 'Optional user-defined signal in the read data channel.']
+  - !Port [rvalid, 1,                'Read valid.',    1, 0, master, 'This signal indicates that the channel is signaling the required read data.']
+  - !Port [rready, 1,                'Read ready.',    1, 0, slave,  'This signal indicates that the master can accept the read data and response information.']
+
+# ==============================================================================
+# AXI4 Bus
+# ==============================================================================
+- !His
+  name : axi4
+  sd   : AXI4 32bit data interface
+  ports:
+  - !HisRef [write_req,  axi4_write_channel,  'Write request',  1, master]
+  - !HisRef [write_resp, axi4_write_response, 'Write response', 1, slave ]
+  - !HisRef [read_req,   axi4_read_channel,   'Read request',   1, master]
+  - !HisRef [read_resp,  axi4_read_response,  'Read response',  1, slave ]
