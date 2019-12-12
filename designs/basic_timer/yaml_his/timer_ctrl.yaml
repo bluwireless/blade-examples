@@ -1,0 +1,18 @@
+- !His
+  name : timer_ctrl
+  sd   : Control bus for the timer
+  ports:
+  - !Port [start,     1, 'Start signal for the timer', 1, 0, master]
+  - !Port [stop,      1, 'Stop signal for the timer',  1, 0, master]
+  - !Port [load_val, 32, 'Value to load',              1, 0, master]
+  - !Port [load_en,   1, 'Strobe signal to load',      1, 0, master]
+  - !Port
+    name : state
+    width: 2
+    sd   : The timer's current state
+    role : slave
+    enum :
+    - !Enum [stopped,  0] # stopped  = 2'b00
+    - !Enum [running    ] # running  = 2'b01
+    - !Enum [overflow, 3] # overflow = 2'b11
+  - !Port [current,  32, 'Current value of the timer', 1, 0, slave ]

@@ -1,0 +1,74 @@
+- !Group
+  name: timer_registers
+  regs:
+  - !Reg
+    name       : id
+    sd         : Identity of the register
+    busaccess  : RO # Read-only to bus accesses
+    blockaccess: RO # Read-only to implementation
+    fields     :
+    - !Field
+      name : value
+      width: 32
+      reset: 0xCAFEFEED
+  - !Reg
+    name       : version
+    sd         : Version of this block
+    busaccess  : RO
+    blockaccess: RO
+    fields     :
+    - !Field
+      name : minor
+      width: 8
+      lsb  : 0 # Optional, when unspecified the next LSB is used
+      reset: 4
+    - !Field
+      name : major
+      width: 8
+      lsb  : 16
+      reset: 2
+  - !Reg
+    name     : control
+    align    : 4 # Optional, will align the address to a 4-word boundary
+    sd       : Start and stop the timer
+    busaccess: AW
+    fields   :
+    - !Field
+      name : start
+      width: 1
+      reset: 0
+    - !Field
+      name : stop
+      width: 1
+      reset: 0
+  - !Reg
+    name     : load
+    addr     : 0x30 # Optional, will place this register at the specified offset
+    sd       : Load the timer to a new value
+    busaccess: AW
+    fields   :
+    - !Field [value, 32, 0]
+  - !Reg
+    name       : state
+    sd         : The state of the timer
+    busaccess  : RO
+    blockaccess: RW
+    fields     :
+    - !Field
+      name : state
+      width: 2
+      reset: 0
+      enums:
+      - !Enum [stopped]
+      - !Enum [running]
+      - !Enum [overflow]
+  - !Reg
+    name       : current
+    sd         : Current value of the timer
+    busaccess  : RO
+    blockaccess: RW
+    fields     :
+    - !Field
+      name : value
+      width: 32
+      reset: 0

@@ -1,0 +1,8 @@
+#include "timer_ctrl.yaml"
+
+- !Mod
+  name   : timer_core
+  sd     : Core of the timer
+  options: [IMP, RTL=../imp_src/timer_core.v]
+  ports  :
+  - !HisRef [ctrl, timer_ctrl, 'Control port', 1, slave]

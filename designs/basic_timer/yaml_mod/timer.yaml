@@ -1,0 +1,22 @@
+#include "apb.yaml"
+
+#include "timer_core.yaml"
+#include "timer_controller.yaml"
+
+- !Mod
+  name       : timer
+  sd         : A simple timer block
+  ports      :
+  - !HisRef [cfg, apb, 'APB access port', 1, slave]
+  modules    :
+  - !ModInst [core, timer_core, 'Core of the timer', 1]
+  - !ModInst
+    name : control
+    ref  : timer_controller
+    sd   : Control block for the timer
+    count: 1
+  connections:
+  - !Connect
+    points:
+    - !Point [cfg]          # When talking about the parent, only one variable needed
+    - !Point [cfg, control] # When referencing a child port, the block name is required

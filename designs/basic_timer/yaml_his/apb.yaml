@@ -1,0 +1,13 @@
+- !His
+  name : apb
+  sd   : AMBA Advanced Peripheral Bus
+  ports:
+  - !Port [paddr,   32, 'Address',             1, 0, master]
+  - !Port [psel,     1, 'Target selection',    1, 0, master]
+  - !Port [penable,  1, 'Transaction enable',  1, 0, master]
+  - !Port [pwrite,   1, 'Write (not read)',    1, 0, master]
+  - !Port [pwdata,  32, 'Write data',          1, 0, master]
+  - !Port [pstrb,    4, 'Byte enable strobes', 1, 0, master]
+  - !Port [pready,   1, 'Slave ready signal',  1, 0, slave ]
+  - !Port [prdata,  32, 'Read data',           1, 0, slave ]
+  - !Port [pslverr,  1, 'Error response',      1, 0, slave ]

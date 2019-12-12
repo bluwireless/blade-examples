@@ -1,0 +1,12 @@
+#include "apb.yaml"
+#include "timer_ctrl.yaml"
+
+#include "timer_registers.yaml"
+
+- !Mod
+  name   : timer_controller
+  sd     : Control block for the timer
+  options: [IMP, RTL=../imp_src/timer_controller.v]
+  ports  :
+  - !HisRef [cfg,  apb,        'APB access port',    1, slave ]
+  - !HisRef [ctrl, timer_ctrl, 'Timer control port', 1, master]
