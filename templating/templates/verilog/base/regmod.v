@@ -212,12 +212,14 @@ function ${verilog.make_range(context.max_reg_width+2)} register_read;
                 read_data[`${prefix}_MSB:`${prefix}_LSB] = \
                 %endif ## field.size == 1
                 %if bladereg.is_block_writeable(reg):
-${bladereg.register_field_name(group, reg, field)}_read;
+${context.fields[field]}_read;
+                %elif bladereg.is_block_writeable(reg):
+${context.fields[field]}_write;
                 %else:
-${bladereg.register_field_name(group, reg, field)}_write;
+`${prefix}_RESET;
                 %endif
                 %if bladereg.is_active_read(reg):
-                ${bladereg.register_field_name(group, reg, field)}_ar = 1'b1;
+                ${context.fields[field]}_ar = 1'b1;
                 %endif ## bladereg.is_active_read(reg)
             %endfor ## field in reg.fields
         %else:
