@@ -20,16 +20,19 @@ from blade_templating.common.rules import rule
 from blade_templating.common.generation import generate
 from designformat import DFBlock, DFBase, DFInterconnect, DFDefine
 
+def class_style(node):
+    return "".join([x.lower().capitalize() for x in node.type.split("_")])
+
 @rule(specific=False, type=DFDefine)
 def gen_defs(nodes, project):
     yield generate(nodes, 'defs.vh', f'{project.id}_defs.vh')
 
 @rule(type=DFBlock, attrs={ 'IMP': False })
 def gen_rtl_wiring(node, project):
-    yield generate(node, 'mod_wiring.v', f'{node.type}.v')
+    yield generate(node, 'mod_wiring.v', f'{class_style(node)}.v')
 
 @rule(type=DFBlock, attrs={ 'IMP': True, 'RTL': '*.v*' })
 def gen_rtl_imp(node, project):
-    yield generate(node, node.getAttribute('RTL'), f'{node.type}_imp.v')
+    yield generate(node, node.getAttribute('RTL'), f'{class_style(node)}Imp.v')
     if node.registers:
         yield generate(node, 'reg_defs.vh', f'{node.type}_reg_defs.vh')
